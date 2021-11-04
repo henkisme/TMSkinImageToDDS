@@ -25,6 +25,7 @@ namespace TrackmaniaSkinImageConverterWPF
         public MainWindow()
         {
             InitializeComponent();
+            OutputDirectoryTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Trackmania\\Skins\\Models\\CarSport";
         }
 
         private void ConvertButtonClick(object sender, RoutedEventArgs e)
