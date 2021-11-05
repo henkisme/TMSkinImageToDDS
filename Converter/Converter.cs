@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 
 namespace TrackmaniaSkinImageConverter
 {
@@ -18,17 +19,28 @@ namespace TrackmaniaSkinImageConverter
 
         }
 
-        public void Convert(String targetDirectory, String outputDirectory, String skinName)
+        public async Task<bool> Convert(String targetDirectory, String outputDirectory, String skinName)
         {
+            var folderName = outputDirectory + "\\" + skinName;
+            var zipName = outputDirectory + "\\" + skinName + ".zip";
+            //Check if zip already exists
+            if(File.Exists(zipName))
+            {
+                return false;
+            }
+
             //Get all files in directory
             string [] fileEntries = Directory.GetFiles(targetDirectory);
             foreach(string fileName in fileEntries)
             {
                 ImageForConverting image = new ImageForConverting(fileName);
-                image.Convert(outputDirectory, skinName);
+                await image.Convert(outputDirectory, skinName);
             }
-            ZipFile.CreateFromDirectory(outputDirectory + "\\" + skinName, outputDirectory + "\\" + skinName + ".zip");
+        
+            ZipFile.CreateFromDirectory(folderName, zipName);
+            
             Directory.Delete(outputDirectory + "\\" + skinName, true);
+            return true;
         }
     }
 

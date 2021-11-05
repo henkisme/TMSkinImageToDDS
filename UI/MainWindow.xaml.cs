@@ -14,6 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
 using TrackmaniaSkinImageConverterWPF;
+using System.IO;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace TrackmaniaSkinImageConverterWPF
 {
@@ -25,14 +28,24 @@ namespace TrackmaniaSkinImageConverterWPF
         public MainWindow()
         {
             InitializeComponent();
+            LoadingFrame.Visibility  = Visibility.Collapsed;
             OutputDirectoryTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Trackmania\\Skins\\Models\\CarSport";
         }
 
-        private void ConvertButtonClick(object sender, RoutedEventArgs e)
+        private async void ConvertButtonClick(object sender, RoutedEventArgs e)
         {
+            LoadingFrame.Visibility = Visibility.Visible;
             if(InputDirectoryTextBox.Text == "")
             {
                 return;
+            }
+            if(!Directory.Exists(InputDirectoryTextBox.Text))
+            {
+                System.Windows.MessageBox.Show("Please enter a valid image directory.");
+            }
+            if(!Directory.Exists(OutputDirectoryTextBox.Text))
+            {
+                System.Windows.MessageBox.Show("Please enter a valid output directory.");
             }
 
             ConvertButton.IsEnabled = false;
@@ -48,11 +61,18 @@ namespace TrackmaniaSkinImageConverterWPF
             if(SkinName == "")
             {
                 SkinName = "MySkin";
+            } 
+            //await Dispatcher.InvokeAsync<bool>(async () => await converter.Convert(InputDirectoryTextBox.Text, OutputDirectoryName, SkinName));
+            var result = await converter.Convert(InputDirectoryTextBox.Text, OutputDirectoryName, SkinName);
+
+            if(!result)
+            {
+                System.Windows.MessageBox.Show("A Zipfile with this name already exists!");
             }
-            Title = "Converting...";
-            converter.Convert(InputDirectoryTextBox.Text, OutputDirectoryName, SkinName);
-            Title = "Conversion complete!";
+            
             ConvertButton.IsEnabled = true;
+            LoadingFrame.Visibility = Visibility.Collapsed;
+            System.Windows.MessageBox.Show("Conversion complete.");
         }
 
         private void InputDirectoryButtonClick(object sender, RoutedEventArgs e)

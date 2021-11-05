@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using BCnEncoder.Encoder;
 using BCnEncoder.ImageSharp;
 using BCnEncoder.Shared;
@@ -27,7 +28,7 @@ namespace TrackmaniaSkinImageConverter
             //Choose compression format based on filename
             compressionFormat = ChooseCompressionFormat();
         }
-        public void Convert(String outputDirectory, String skinName)
+        public async Task Convert(String outputDirectory, String skinName)
         {
             if (compressionFormat != CompressionFormat.Unknown)
             {
@@ -42,7 +43,8 @@ namespace TrackmaniaSkinImageConverter
 
                 Directory.CreateDirectory(outputDirectory + "\\" + skinName);
                 using FileStream fs = File.OpenWrite(outputDirectory + "\\" + skinName + "\\" + fileName + ".dds");
-                encoder.EncodeToStream(image, fs);
+                await encoder.EncodeToStreamAsync(image, fs);
+                //encoder.EncodeToStream(image, fs);
             }
 
         }
